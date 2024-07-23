@@ -655,8 +655,6 @@ procedure TMainFrm.UpdateDisplay ;
 // -------------------
 var
     StartPoints : Integer ;
-    i,j,YMax : Integer ;
- //   RangeChange : Boolean ;
 begin
 
   if ((NumPointsInBuf - scDisplay.XOffset) >= scDisplay.MaxPoints) then
@@ -677,22 +675,9 @@ begin
     else
        begin
 
-  //     RangeChange := False ;
-  {     for i  := 0 to NumChannels-1 do
-           begin
-           YMax := Round( Model.ChanValues[i]/scDisplay.ChanScale[i] ) ;
-           if YMax > scDisplay.YMax[i] then
-           begin
-              scDisplay.YMax[i] := scDisplay.YMax[i]*1.5 ;
-              RangeChange := True ;
-              end;
-           end;                   }
-
-       //scDisplay.DisplayNewPoints( NumPointsInBuf - 1 - scDisplay.XOffset, false{not RangeChange} ) ;
        scDisplay.NumPoints := NumPointsInBuf - scDisplay.XOffset ;
 
        scDisplay.Repaint ;
-       RangeChange := False ;
        end;
 
   //  scDisplay.Repaint ;
