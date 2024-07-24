@@ -6,7 +6,7 @@
         <MainSource>Cat.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">OSX64</Platform>
         <TargetedPlatforms>4099</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -54,6 +54,17 @@
         <Cfg_1_Win64>true</Cfg_1_Win64>
         <CfgParent>Cfg_1</CfgParent>
         <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSX64)'!=''">
+        <Cfg_2_OSX64>true</Cfg_2_OSX64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
@@ -112,8 +123,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_OSX64)'!=''">
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=4.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationUsageDescription=The reason for accessing the location information of the user;NSContactsUsageDescription=The reason for accessing the contacts;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&apos;s speech recognition servers;ITSAppUsesNonExemptEncryption=false</VerInfo_Keys>
-        <Icon_MainIcon>RatCVS_Icon.ico</Icon_MainIcon>
-        <Icns_MainIcns>RatCVS_Icon.icns</Icns_MainIcns>
+        <Icon_MainIcon>CAT.ICO</Icon_MainIcon>
+        <Icns_MainIcns>Cat.icns</Icns_MainIcns>
         <PF_AppleID>john.dempster0@gmail.com</PF_AppleID>
         <PF_AppSpecificPassword>853F47CC5F920785CF3CE53EA45B7BB6E45E080C7EBFECA09F08777AD849A8AEA5EB5D0A7F631C61C1BD5765FAB3C363BAB3361C04652294162B458CE5F52284C946F35DD545FA95BFA2AF3F072C1D0A92003E071DBA097BE3FD16D14425789365CA9A8422F1</PF_AppSpecificPassword>
         <PF_TeamID>5C32G7C3QT</PF_TeamID>
@@ -125,13 +136,21 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
         <Icon_MainIcon>CAT.ICO</Icon_MainIcon>
-        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_MajorVer>3</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileVersion=3.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <Icns_MainIcns>Cat.icns</Icns_MainIcns>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_OSX64)'!=''">
+        <PF_StapleTicket>true</PF_StapleTicket>
+        <VerInfo_MajorVer>1</VerInfo_MajorVer>
+        <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationUsageDescription=The reason for accessing the location information of the user;NSContactsUsageDescription=The reason for accessing the contacts;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&apos;s speech recognition servers;ITSAppUsesNonExemptEncryption=false</VerInfo_Keys>
+        <Icon_MainIcon>CAT.ICO</Icon_MainIcon>
+        <Icns_MainIcns>Cat.icns</Icns_MainIcns>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -147,11 +166,18 @@
         <DCCReference Include="ModalBox.pas">
             <Form>ModalBoxFrm</Form>
         </DCCReference>
+        <DCCReference Include="FMX.Platform.Mac.pas">
+            <Form>$ENDIF</Form>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
         <BuildConfiguration Include="Release">
             <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
@@ -194,6 +220,29 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\delphi_PROJECTICNS.icns" Configuration="Release" Class="ProjectOSXResource"/>
+                <DeployFile LocalName="Cat.icns" Configuration="Debug" Class="ProjectOSXResource">
+                    <Platform Name="OSX64">
+                        <RemoteName>Cat.icns</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Cat.icns" Configuration="Release" Class="ProjectOSXResource">
+                    <Platform Name="OSX64">
+                        <RemoteName>Cat.icns</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="OSX64\Debug\Cat.entitlements" Configuration="Debug" Class="ProjectOSXEntitlements">
+                    <Platform Name="OSX64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="OSX64\Debug\Cat.info.plist" Configuration="Debug" Class="ProjectOSXInfoPList">
+                    <Platform Name="OSX64">
+                        <RemoteName>Info.plist</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="OSX64\Debug\Cat" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="OSX64">
                         <RemoteName>Cat</RemoteName>
@@ -201,19 +250,19 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="OSX64\Debug\RatCVS.entitlements" Configuration="Debug" Class="ProjectOSXEntitlements"/>
-                <DeployFile LocalName="OSX64\Debug\RatCVS.entitlements" Configuration="Debug" Class="ProjectOSXEntitlements">
+                <DeployFile LocalName="OSX64\Debug\RatCVS.info.plist" Configuration="Debug" Class="ProjectOSXInfoPList"/>
+                <DeployFile LocalName="OSX64\Debug\RatCVS" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="OSX64\Release\Cat.entitlements" Configuration="Release" Class="ProjectOSXEntitlements">
                     <Platform Name="OSX64">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="OSX64\Debug\RatCVS.info.plist" Configuration="Debug" Class="ProjectOSXInfoPList"/>
-                <DeployFile LocalName="OSX64\Debug\RatCVS.info.plist" Configuration="Debug" Class="ProjectOSXInfoPList">
+                <DeployFile LocalName="OSX64\Release\Cat.info.plist" Configuration="Release" Class="ProjectOSXInfoPList">
                     <Platform Name="OSX64">
                         <RemoteName>Info.plist</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="OSX64\Debug\RatCVS" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="OSX64\Release\Cat" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="OSX64">
                         <RemoteName>Cat</RemoteName>
@@ -221,18 +270,7 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="OSX64\Release\RatCVS.entitlements" Configuration="Release" Class="ProjectOSXEntitlements"/>
-                <DeployFile LocalName="OSX64\Release\RatCVS.entitlements" Configuration="Release" Class="ProjectOSXEntitlements">
-                    <Platform Name="OSX64">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="OSX64\Release\RatCVS.info.plist" Configuration="Release" Class="ProjectOSXInfoPList"/>
-                <DeployFile LocalName="OSX64\Release\RatCVS.info.plist" Configuration="Release" Class="ProjectOSXInfoPList">
-                    <Platform Name="OSX64">
-                        <RemoteName>Info.plist</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="OSX64\Release\RatCVS" Configuration="Release" Class="ProjectOutput"/>
                 <DeployFile LocalName="RatCVS_Icon.icns" Configuration="Debug" Class="ProjectOSXResource"/>
                 <DeployFile LocalName="RatCVS_Icon.icns" Configuration="Debug" Class="ProjectOSXResource">

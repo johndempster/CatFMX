@@ -86,7 +86,7 @@ type
     CatSetup: TImageControl;
     BitmapAnimation1: TBitmapAnimation;
     ControlsGrp: TGroupBox;
-    TissueGrp: TGroupBox;
+    ExperimentGrp: TGroupBox;
     bNewExperiment: TButton;
     StimulusGrp: TGroupBox;
     DrugsTab: TTabControl;
@@ -552,8 +552,6 @@ begin
 
      rbVenousInjection.IsChecked := True ;
      rbCloseArterialInjection.IsChecked := False ;
-
-     TissueGrp.Enabled := True ;
 
      // Clear chart annotation
      MarkerList.Clear ;
@@ -1415,13 +1413,13 @@ begin
 
 
 procedure TMainFrm.mnWebHelpClick(Sender: TObject);
-//
+// --------------------------------------
 // Web Help - Wiki from GitHub repository
 // --------------------------------------
 var
   URL: string;
 begin
-  URL := 'https://github.com/johndempster/RatCVSFMX/wiki';
+  URL := 'https://github.com/johndempster/CatFMX/wiki';
 {$IFDEF MSWINDOWS}
   URL := StringReplace(URL, '"', '%22', [rfReplaceAll]);
   ShellExecute(0, 'open', PChar(URL), nil, nil, SW_SHOWNORMAL);

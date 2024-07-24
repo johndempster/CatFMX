@@ -1,7 +1,7 @@
 object MainFrm: TMainFrm
   Left = 0
   Top = 0
-  Caption = 'Anaesthetised Cat V3.0.0 22.7.24'
+  Caption = 'Anaesthetised Cat V3.0.0 24.7.24 ((c) J. Dempster, 1996-2024)'
   ClientHeight = 720
   ClientWidth = 1180
   StyleBook = StyleBook1
@@ -7473,19 +7473,20 @@ object MainFrm: TMainFrm
   object ControlsGrp: TGroupBox
     Anchors = [akLeft, akTop, akBottom]
     Position.X = 8.000000000000000000
-    Position.Y = 57.000000000000000000
+    Position.Y = 54.000000000000000000
     Size.Width = 289.000000000000000000
     Size.Height = 658.000000000000000000
     Size.PlatformDefault = False
+    Text = 'Controls'
     TabOrder = 1
-    object TissueGrp: TGroupBox
+    object ExperimentGrp: TGroupBox
       Anchors = [akLeft, akTop, akRight]
       Position.X = 8.000000000000000000
-      Position.Y = 8.000000000000000000
+      Position.Y = 16.000000000000000000
       Size.Width = 265.000000000000000000
       Size.Height = 65.000000000000000000
       Size.PlatformDefault = False
-      Text = ' Tissue Type '
+      Text = 'Experiment'
       TabOrder = 1
       object bNewExperiment: TButton
         Anchors = [akLeft, akTop, akRight]
@@ -7507,7 +7508,7 @@ object MainFrm: TMainFrm
       Size.Width = 265.000000000000000000
       Size.Height = 112.000000000000000000
       Size.PlatformDefault = False
-      Text = ' Stimulus '
+      Text = 'Stimulator'
       TabOrder = 2
       object bStartStimulator: TButton
         Hint = 'Start nerve stimulation'
@@ -7534,6 +7535,7 @@ object MainFrm: TMainFrm
         OnClick = bStopStimulatorClick
       end
       object ckVagusNerve: TCheckBox
+        Hint = 'Stimulate vagus nerve'
         Position.X = 8.000000000000000000
         Position.Y = 50.000000000000000000
         Size.Width = 201.000000000000000000
@@ -7541,8 +7543,11 @@ object MainFrm: TMainFrm
         Size.PlatformDefault = False
         TabOrder = 5
         Text = 'Vagus Nerve'
+        ParentShowHint = False
+        ShowHint = True
       end
       object ckNicMembrane: TCheckBox
+        Hint = 'Stimulate nerve to nictitating membrane over cat'#39's eye'
         Position.X = 8.000000000000000000
         Position.Y = 67.000000000000000000
         Size.Width = 201.000000000000000000
@@ -7550,8 +7555,11 @@ object MainFrm: TMainFrm
         Size.PlatformDefault = False
         TabOrder = 4
         Text = 'Nictitating Membrane'
+        ParentShowHint = False
+        ShowHint = True
       end
       object ckSkeletalMuscle: TCheckBox
+        Hint = 'Stimulate nerve to tibialis anterior skeletal muscle'
         Position.X = 8.000000000000000000
         Position.Y = 85.000000000000000000
         Size.Width = 201.000000000000000000
@@ -7559,6 +7567,8 @@ object MainFrm: TMainFrm
         Size.PlatformDefault = False
         TabOrder = 3
         Text = 'Skeletal Muscle'
+        ParentShowHint = False
+        ShowHint = True
       end
     end
     object DrugsTab: TTabControl
@@ -7615,16 +7625,17 @@ object MainFrm: TMainFrm
           TabOrder = 2
         end
         object Label1: TLabel
-          Position.X = 16.000000000000000000
-          Position.Y = 54.000000000000000000
-          Size.Width = 97.000000000000000000
-          Size.Height = 17.000000000000000000
+          Hint = 'Z'
+          Position.X = 62.000000000000000000
+          Position.Y = 55.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 31.000000000000000000
           Size.PlatformDefault = False
           Text = 'Dose'
           TabOrder = 4
         end
         object bAddAgonist: TButton
-          Hint = 'Inject agonist into vein'
+          Hint = 'Inject agonist into vein or artery'
           Position.X = 16.000000000000000000
           Position.Y = 94.000000000000000000
           Size.Width = 233.000000000000000000
@@ -7652,7 +7663,9 @@ object MainFrm: TMainFrm
         end
         object rbCloseArterialInjection: TRadioButton
           GroupName = 'TissueGrp'
-          Hint = 'Pithed rat (no central cardiovascular reflexes)'
+          Hint = 
+            'Inject drug into artery feeding tibialis anterior skeletal muscl' +
+            'e'
           Position.X = 16.000000000000000000
           Position.Y = 160.000000000000000000
           Size.Width = 150.000000000000000000

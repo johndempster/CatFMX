@@ -1,0 +1,124 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Condition="Exists('$(BDS)\bin\CodeGear.Deployment.targets')" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
+    <ProjectExtensions>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <PropertyGroup/>
+    <ItemGroup Condition="'$(Platform)'=='Win64'"/>
+    <ItemGroup Condition="'$(Platform)'=='OSX64'">
+        <DeployFile Include="OSX64\Release\Cat.entitlements" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat.app\..\</RemoteDir>
+            <RemoteName>Cat.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="RatCVS_Icon.icns" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
+            <RemoteName>RatCVS.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="RatCVS_Icon.icns" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
+            <RemoteName>RatCVS.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Debug\Cat.entitlements" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\..\</RemoteDir>
+            <RemoteName>Cat.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Debug\Cat" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>Cat</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="OSX64\Debug\Cat.info.plist" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Release\Cat" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>Cat</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="Cat.icns" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
+            <RemoteName>Cat.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Cat.icns" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
+            <RemoteName>Cat.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Release\Cat.info.plist" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\delphi_PROJECTICNS.icns" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
+            <RemoteName>RatCVS.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='Win32'">
+        <DeployFile Include="Win32\Release\Cat.exe" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat\</RemoteDir>
+            <RemoteName>Cat.exe</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='OSXARM64'"/>
+</Project>
