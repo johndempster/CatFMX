@@ -6,6 +6,15 @@
     <PropertyGroup/>
     <ItemGroup Condition="'$(Platform)'=='Win64'"/>
     <ItemGroup Condition="'$(Platform)'=='OSX64'">
+        <DeployFile Include="OSX64\Debug\Cat.info.plist" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="OSX64\Release\Cat.entitlements" Condition="'$(Config)'=='Release'">
             <RemoteDir>Cat.app\..\</RemoteDir>
             <RemoteName>Cat.entitlements</RemoteName>
@@ -33,15 +42,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="OSX64\Debug\Cat.entitlements" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>Cat.app\..\</RemoteDir>
-            <RemoteName>Cat.entitlements</RemoteName>
-            <DeployClass>ProjectOSXEntitlements</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="OSX64\Debug\Cat" Condition="'$(Config)'=='Debug'">
             <RemoteDir>Cat.app\Contents\MacOS\</RemoteDir>
             <RemoteName>Cat</RemoteName>
@@ -51,15 +51,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
             <Required>True</Required>
-        </DeployFile>
-        <DeployFile Include="OSX64\Debug\Cat.info.plist" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>Cat.app\Contents\</RemoteDir>
-            <RemoteName>Info.plist</RemoteName>
-            <DeployClass>ProjectOSXInfoPList</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
         </DeployFile>
         <DeployFile Include="OSX64\Release\Cat" Condition="'$(Config)'=='Release'">
             <RemoteDir>Cat.app\Contents\MacOS\</RemoteDir>
@@ -71,15 +62,6 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-        <DeployFile Include="Cat.icns" Condition="'$(Config)'=='Release'">
-            <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
-            <RemoteName>Cat.icns</RemoteName>
-            <DeployClass>ProjectOSXResource</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="Cat.icns" Condition="'$(Config)'=='Debug'">
             <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
             <RemoteName>Cat.icns</RemoteName>
@@ -89,10 +71,10 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="OSX64\Release\Cat.info.plist" Condition="'$(Config)'=='Release'">
-            <RemoteDir>Cat.app\Contents\</RemoteDir>
-            <RemoteName>Info.plist</RemoteName>
-            <DeployClass>ProjectOSXInfoPList</DeployClass>
+        <DeployFile Include="Cat.icns" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
+            <RemoteName>Cat.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -102,6 +84,24 @@
             <RemoteDir>Cat.app\Contents\Resources\</RemoteDir>
             <RemoteName>RatCVS.icns</RemoteName>
             <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Debug\Cat.entitlements" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>Cat.app\..\</RemoteDir>
+            <RemoteName>Cat.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Release\Cat.info.plist" Condition="'$(Config)'=='Release'">
+            <RemoteDir>Cat.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>

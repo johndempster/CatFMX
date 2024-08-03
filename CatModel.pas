@@ -134,8 +134,9 @@ type
   private
     { Private declarations }
     LastAgonist : Integer ;      // Index of last agonist in drug list
-    LastAntagonist : Integer ;      // Index of last antagonist in drug list
-
+    LastAntagonist : Integer ;   // Index of last antagonist in drug list
+    LastDrug : Integer ;         // Index of last addable drug in drug list
+                                 // (Remainder in list are nerve-released transmitters)
 
    t : TTime ;
    {Standard drugs }
@@ -684,6 +685,9 @@ begin
      Drugs[iDrug].DrugType := dtUnknown ;
      Drugs[iDrug].MinDose := 0.1 ;
      Drugs[iDrug].MaxDose := 10.0 ;
+
+     // Last drug in list
+     LastDrug := iDrug ;
 
 
 {    *** NERVE STIMULATION **************************************************}
@@ -1285,7 +1289,9 @@ begin
 
      DrugList.Clear ;
 
-     for i := 0 to NumDrugs-1 do
+
+     // Add defined drugs from list (excluding nerve evoked transmitters)
+     for i := 0 to LastDrug do
          if DrugType = Drugs[i].DrugType then
             begin
             DrugList.Items.AddObject( Drugs[i].Name, TObject(i)) ;

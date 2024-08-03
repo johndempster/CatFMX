@@ -1,7 +1,9 @@
 object MainFrm: TMainFrm
   Left = 0
   Top = 0
-  Caption = 'Anaesthetised Cat V3.0.0 24.7.24 ((c) J. Dempster, 1996-2024)'
+  Caption = 
+    'Anaesthetised Cat V3.0.1 (c) J. Dempster, University of Strathcl' +
+    'yde 1996-2024. (2.8.24)'
   ClientHeight = 720
   ClientWidth = 1180
   StyleBook = StyleBook1
