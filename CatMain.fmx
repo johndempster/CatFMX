@@ -7742,7 +7742,7 @@ object MainFrm: TMainFrm
           item
           end>
         IsSelected = False
-        Size.Width = 79.000000000000000000
+        Size.Width = 80.000000000000000000
         Size.Height = 27.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = ''

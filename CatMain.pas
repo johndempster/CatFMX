@@ -52,6 +52,7 @@ unit CatMain;
   3.3.37 30.07.20     Channel blockers and enzyme inhibitors now moved from agonisy to antagonisy list
                       Incorrect alpha-2 adrenoceptor agonist activity of phentolamine removed
   4.0.0  12.07.24     Rebuilt using FMX multiplatfom framework
+  V3.0.1 2.8.24       Invalid entries in agonist drugs list which caused crashes removed.
   ======================================================================== }
 
 interface
