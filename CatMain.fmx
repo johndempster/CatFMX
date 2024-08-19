@@ -4,7 +4,7 @@ object MainFrm: TMainFrm
   Caption = 
     'Anaesthetised Cat V3.0.2 (c) J. Dempster, University of Strathcl' +
     'yde 1996-2024. 19.8.24)'
-  ClientHeight = 897
+  ClientHeight = 896
   ClientWidth = 1180
   StyleBook = StyleBook1
   FormFactor.Width = 320
@@ -7572,7 +7572,7 @@ object MainFrm: TMainFrm
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 3
-        Text = 'Skeletal Muscle Nevre'
+        Text = 'Skeletal Muscle Nerve'
         ParentShowHint = False
         ShowHint = True
       end
@@ -7746,7 +7746,7 @@ object MainFrm: TMainFrm
           item
           end>
         IsSelected = False
-        Size.Width = 80.000000000000000000
+        Size.Width = 79.000000000000000000
         Size.Height = 27.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = ''
