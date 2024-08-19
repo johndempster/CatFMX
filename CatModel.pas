@@ -5,6 +5,11 @@ unit CatModel;
 // 18.07.24 Model code moved from CatMain to CatModel
 // 23.07.24 Carbachol Failure to stimulate muscarinic receptors corrected
 //                    Potency at nicotinic receptors now the same as Ach
+// 18.08.24 Ciculating NicCh agonists no longer have any action on ganglion leading to nic. membrane
+//          Heart contracition now a guassian pulse
+//          Chronic oscillation removed from baroreceptor feedback
+//          Cat now dies when BP exceeds 400 mmHg or < 10 mmHg for too long
+//          adrenergic sy
 
 interface
 
@@ -21,20 +26,11 @@ const
     dtUnknown = 3 ;
     dtNerve = 4 ;
 
-     NumChannels = 4 ; // No. of chart traces
-     ChABP = 0 ;   // Arterial blood pressure channel }
-     ChHR = 1 ;    // Heart rate channel }
-     ChNIC = 2 ;   // Nictitating membrane }
-     ChSKM = 3 ;   // Skeletal muscle
 
-     NMMax = 100 ;
-     SKMax = 100 ;
-     BPMax = 200 ;
-
-     MaxADCValue = 2047 ;
-     MinADCValue = -2048 ;
-
-
+     NMMax = 100 ;      // Nicitating membrane contrsaction max (gms)
+     SKMax = 100 ;      // Skeletal muscle contraction max (gms)
+     BPMax = 200 ;      // BP Normal upper limit (mmHg)
+     BPFatal = 400 ;    // BP which causes death (mmHg)
 type
 
     TDrugProperties = record
@@ -86,6 +82,7 @@ type
           time : single ;
           diastole : single ;
           systole : single ;
+          pulse : single ;
           step : single ;
           next : single ;
           StimVagus : single ;
@@ -98,6 +95,7 @@ type
         systolic : single ;
         mean : single ;
         value : single ;
+        PreviousValue : single ;
         Sum : single ;
         nAvg : Integer ;
         end ;
@@ -127,6 +125,11 @@ type
            Activity : single ;
            end ;
 
+    TBPDelay = record
+        Buf : Array[0..999] of Single ;
+        InPointer : Integer ;
+        OutPointer : Integer ;
+        end ;
 
   TModel = class(TDataModule)
     procedure DataModuleCreate(Sender: TObject);
@@ -169,7 +172,7 @@ type
    SkelMuscle : TMuscle ; // Skeletal muscle state
    NicMem : TMuscle ;    // Nictitating membrane state
    BP : TBP ;
-
+   BPDelay : TBPDelay ;
 
    Dying : LongInt ;
    Fibrillation : single ;
@@ -184,14 +187,10 @@ type
     Drugs : Array[0..MaxDrugs] of TDrug ;               // Drug properties array
     Dead : boolean ;
 
-   // Chart trace channels
-    ChanNames : Array[0..NumChannels-1] of string  ;      // Channel names
-    ChanUnits : Array[0..NumChannels-1] of string  ;      // Channel units
-    ChanValues : Array[0..NumChannels*2-1] of single  ;   // Channel values (pair of time points)
-
     procedure InitializeSimulation ;
 
     procedure DoSimulationStep( var ArterialBP : single ;
+                                var ArterialBPMean : single ;
                                  var HeartRate : single ;
                                  var SkeletalMuscleContraction : single ;
                                  var NicMemContraction : single ) ;
@@ -257,20 +256,20 @@ begin
 
   // Output channels
 
-     ChanNames[ChABP] := 'ABP' ;
-     ChanUnits[ChABP] := 'mmHg' ;
+//     ChanNames[ChABP] := 'ABP' ;
+//     ChanUnits[ChABP] := 'mmHg' ;
 
      { Heart rate }
-     ChanNames[chHR] := 'HR' ;
-     ChanUnits[chHR] := 'BPM' ;
+//     ChanNames[chHR] := 'HR' ;
+//     ChanUnits[chHR] := 'BPM' ;
 
      { Left ventricular pressure }
-     ChanNames[chNic] := 'NcM' ;
-     ChanUnits[chNic] := 'gms' ;
+ //    ChanNames[chNic] := 'NcM' ;
+ //    ChanUnits[chNic] := 'gms' ;
 
      { Venous Pressure }
-     ChanNames[chSKM] := 'SkM' ;
-     ChanUnits[chSKM] := 'gms' ;
+ //    ChanNames[chSKM] := 'SkM' ;
+ //    ChanUnits[chSKM] := 'gms' ;
 
      // Initialise simulation conditions & drugs
      InitializeSimulation ;
@@ -300,8 +299,8 @@ const
      FastOff = 0.1 ;
      SlowOn = 0.03  ; //0.075
      SlowOff = 0.005 ;
-     NerveOn = 50.0 ;
-     NerveOff = 50.0 ;
+     NerveOn = 100.0 ;//50.0 ;
+     NerveOff = 100.0 ; //50.0 ;
 var
    iDrug,i : Integer ;
 begin
@@ -322,23 +321,23 @@ begin
      Drugs[iDrug] := TDrug.Create( 'Adrenaline', 'Adr' ) ;
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 6E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 6E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdR, 3.5E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 3.5E-4 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.001 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.002 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.0015 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.0017 ) ;
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 1E-4 ;
-     Drugs[iDrug].MaxDose := 1E-2 ;
+     Drugs[iDrug].MaxDose := 2E-2 ;
 
      // Noradrenaline Adrenoceptor agonist (Alpha > Beta )
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create( 'Noradrenaline', 'Nor' ) ; // Adrenoceptor agonist
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 2E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 5E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdR, {7.5E-4} 2.0E-3) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, {7.5E-4 } 2.0E-3 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.002 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.002 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.02 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.02 ) ;
      Drugs[iDrug].MinDose := 1E-4 ;
      Drugs[iDrug].MaxDose := 1E-2 ;
      Drugs[iDrug].DrugType := dtAgonist ;
@@ -348,10 +347,10 @@ begin
      Drugs[iDrug] := TDrug.Create(  'Isoprenaline', 'Iso' ) ;
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdR, 5E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 5E-4 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.004 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.004 ) ;
      Drugs[iDrug].MinDose := 1E-4 ;
-     Drugs[iDrug].MaxDose := 1E-2 ;
+     Drugs[iDrug].MaxDose := 2E-2 ;
      Drugs[iDrug].DrugType := dtAgonist ;
 
      // Phenylephrine - Alpha adrenoceptor agonist
@@ -359,10 +358,10 @@ begin
      Drugs[iDrug] := TDrug.Create(  'Phenylephrine', 'Phe' ) ;
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 5E-3 ) ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 5E-3 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.006 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.006 ) ;
      Drugs[iDrug].MinDose := 1E-4 ;
-     Drugs[iDrug].MaxDose := 1E-1 ;
+     Drugs[iDrug].MaxDose := 1E-2 ;
      Drugs[iDrug].DrugType := dtAgonist ;
 
      // Cholinoceptor agonist
@@ -373,21 +372,10 @@ begin
      SetAgonistPotency( Drugs[iDrug].MusChR, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].MusChRHeart, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].NicChR, 0.001 ) ;
-     SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
+//   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 1E-4 ;
      Drugs[iDrug].MaxDose := 1.0 ;
-
-     { Acetylcholine (when injected in artery to tibialis muscle) }
- {    ArterialAcetylcholine.Dose := 0. ;
-     ArterialAcetylcholine.DoseInjected := 0. ;
-     ArterialAcetylcholine.ed50 := 0.002*AddNoise( 0.5 ) ;
-     ArterialAcetylcholine.OnRate := 0.1 ;
-     ArterialAcetylcholine.RemovalRate := 0.08 ;
-     Inc(iCount) ;
-     ArterialAcetylcholine.Index := iCount ;
-     ShortName[ArterialAcetylcholine.Index] := 'Ach(Art)' ;
-     DoseUnits[iCount] := 'ug/kg' ;}
 
      // Cholinoceptor agonist (non hydrolysable)
      // 23.07.24 Failure to stimulate muscarinic receptors corrected
@@ -397,7 +385,7 @@ begin
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
      SetAgonistPotency( Drugs[iDrug].NicChR, 0.001 ) ;
-     SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
+//   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
      SetAgonistPotency( Drugs[iDrug].MusChR, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].MusChRHeart, 0.001 ) ;
      Drugs[iDrug].MinDose := 1E-4 ;
@@ -410,7 +398,7 @@ begin
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff*0.5 ;
      SetAgonistPotency( Drugs[iDrug].NicChR, 0.03) ;
-     SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.03) ;
+//   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.03) ;
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 0.01 ;
      Drugs[iDrug].MaxDose := 5.0 ;
@@ -424,19 +412,6 @@ begin
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 0.1 ;
      Drugs[iDrug].MaxDose := 10.0 ;
-
-
-//     Inc(iDrug) ;
-//     Drugs[iDrug] := TDrug.Create(  'Acetylcholine', 'Ach' ) ;
-//     Drugs[iDrug].OnRate := FastOn ;
-//     Drugs[iDrug].RemovalRate := FastOff*2.0 ;
-//     SetAgonistPotency( Drugs[iDrug].MusChR, 5E-3 ) ;
- //    SetAgonistPotency( Drugs[iDrug].NicChR, 0.15 ) ;
-  //   SetAgonistPotency( Drugs[iDrug].NicChRDesensitization, 0.15 ) ;
-//     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.3 ) ;
-//     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.15 ) ;
-  //   Drugs[iDrug].MinDose := 1E-3 ;
-  //   Drugs[iDrug].MaxDose := 1. ;
 
      // Adenosine Adenoine receptor agonist
      Inc(iDrug) ;
@@ -619,11 +594,10 @@ begin
      SetAgonistPotency( Drugs[iDrug].MusChR, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].MusChRHeart, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].NicChR, 0.001 ) ;
-     SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
+//   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
      Drugs[iDrug].DrugType := dtUnknown ;
      Drugs[iDrug].MinDose := 1E-4 ;
      Drugs[iDrug].MaxDose := 1.0 ;
-
 
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create(  'Drug B', 'B' ) ;     { Adenosine  }
@@ -638,23 +612,23 @@ begin
      Drugs[iDrug] := TDrug.Create(  'Drug C', 'C' ) ;    { Isoprenaline }
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdR, 5E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 5E-4 ) ;
-     Drugs[iDrug].DrugType := dtUnknown ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.004 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.004 ) ;
      Drugs[iDrug].MinDose := 1E-4 ;
-     Drugs[iDrug].MaxDose := 1E-2 ;
+     Drugs[iDrug].MaxDose := 2E-2 ;
+     Drugs[iDrug].DrugType := dtUnknown ;
 
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create(  'Drug D', 'D' ) ;    { Noradrenaline }
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 2E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 5E-4 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdR, {7.5E-4} 2.0E-3) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, {7.5E-4 } 2.0E-3 ) ;
-     Drugs[iDrug].DrugType := dtUnknown ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.002 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.002 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.02 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.02 ) ;
      Drugs[iDrug].MinDose := 1E-4 ;
      Drugs[iDrug].MaxDose := 1E-2 ;
+     Drugs[iDrug].DrugType := dtUnknown ;
 
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create(  'Drug H', 'H' ) ;     { Propanalol }
@@ -695,18 +669,18 @@ begin
      // Accelerans post ganglionic transmitter release
      // Activates beta adrenoceptors on heart
      Inc(iDrug) ;
-     Drugs[iDrug] := TDrug.Create(  'Accelerans', '' ) ;
+     Drugs[iDrug] := TDrug.Create(  'AcceleransBaroreceptors', '' ) ;
      Drugs[iDrug].OnRate := NerveOn ;
      Drugs[iDrug].RemovalRate := NerveOff ;
      SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 1.0 ) ;
      iAcceleransBaroreceptors := iDrug ;
 
-     Inc(iDrug) ;
+  {   Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create(  'Resting Sympathetic', '' ) ;
      Drugs[iDrug].OnRate := NerveOn ;
      Drugs[iDrug].RemovalRate := NerveOff ;
      SetAgonistPotency( Drugs[iDrug].AlphaAdR, 1.0 ) ;
-     iRestingSympathetic := iDrug ;
+     iRestingSympathetic := iDrug ;}
 
      // Vagus nerve post-ganglion transmitter release produced by baroreceptor activity
      // Activates muscarinic cholinoceptors on heart
@@ -721,9 +695,9 @@ begin
      // Activates muscarinic cholinoceptors on heart
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create(  'VagusStim', '' ) ;
-     Drugs[iDrug].OnRate := NerveOn*0.025 ;
-     Drugs[iDrug].RemovalRate := NerveOff*0.05 ;
-     SetAgonistPotency( Drugs[iDrug].MusChRHeart, 1.0 ) ;
+     Drugs[iDrug].OnRate := NerveOn*0.017 ;
+     Drugs[iDrug].RemovalRate := NerveOff*0.017 ;
+     SetAgonistPotency( Drugs[iDrug].MusChRHeart, 1.7 ) ;
      iVagusStim := iDrug ;
 
      { Pre-ganglionic nerve innervating nictitating membrane stimulates nicotonic choliniceptors }
@@ -739,7 +713,7 @@ begin
      Drugs[iDrug] := TDrug.Create(  'NicMemPostGanglionic', 'NicMemPostGanglionic' ) ;
      Drugs[iDrug].OnRate := NerveOn*0.05 ;
      Drugs[iDrug].RemovalRate := NerveOff*0.1 ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 1.0 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.5 ) ;
      iNicMemPostGanglionic := iDrug ;
 
      // Skeletal muscle nerve stimulation
@@ -762,14 +736,17 @@ begin
      t.Step := 0.02 ;
      t.time := 0. ;
      t.systole := 0. ;
-     bp.value := 100.0/BPMAX ;
+     t.pulse := 0.0 ;
+     bp.value := 95.0/BPMAX ;
+     bp.systolic := 130.0 / BPMAX ;
+     bp.diastolic := 85.0 / BPMAX ;
      bp.mean := bp.value ;                            // Mean BP at restring level
      bp.Sum := bp.mean ;
      bp.nAvg := 1 ;
      baroreceptors := 0.5 ;                           // No baroreceptor activity
      NicChRDesensitization := 1.0 ;                   // No nicotinic receptor desensitization
-     PulseInterval := 60.0 / 100.0 ;
-
+     Heart.Rate := 105 ;
+     PulseInterval := 60. / Max(Heart.Rate,1.0) ;
 
      Dead := False ;
      Dying := 0 ;
@@ -781,7 +758,9 @@ begin
 
 
 
+
 procedure TModel.DoSimulationStep( var ArterialBP : single ;
+                                   var ArterialBPMean : single ;
                                    var HeartRate : single ;
                                    var SkeletalMuscleContraction : single ;
                                    var NicMemContraction : single ) ;
@@ -792,9 +771,9 @@ procedure TModel.DoSimulationStep( var ArterialBP : single ;
 var
    dbp,PeripheralFlow,BPResting : single ;
    ch,i,j : Integer ;
-   Num,Denom : single ;
+   Num,Denom,z,y : single ;
    Smooth : single ;
-   PotencyMultiplier : single ;
+   PotencyMultiplier,APDuration,APForceSD : single ;
 begin
 
      { Update drugs in circulation }
@@ -831,13 +810,9 @@ begin
 
      { Vagus nerve stimulation (Blocked by morphine ) }
 
-       { Set vagus nerve activity to a base level (0.1) +
-         activity due baroceptors activated by high B.P. }
-       Smooth := 0.1*t.step / Min(PulseInterval,10.0) ;
-       bp.mean := Smooth*bp.value + (1.0-Smooth)*bp.mean ;
        BPResting := 100.0/BPMAX ;
-       Baroreceptors := 1.0 / (1.0 + exp( -(bp.mean - BPResting)/0.12)) ;
- //  Baroreceptors := 0.5 ;
+ //      bp.mean := BPResting ;
+       Baroreceptors := 1.0 / (1.0 + exp( -(BP.mean - BPResting)/0.12)) ;
 
       // Nicotinic cholinoceptor channel block on ganglion neuronss
       for i := 0 to High(Drugs) do if Drugs[i] <> Nil then
@@ -849,6 +824,7 @@ begin
        { V2.2 1/10/97 Cholinesterase inhibition now enhances release of
          Ach from vagus, requested by EGR }
 
+       log.d(format('%.4g',[Baroreceptors])) ;
        Drugs[iVagusBaroreceptors].Dose := 0.6*Baroreceptors
                                           * (1.0 + (ChEsterase*10.0) )
                                           * (1.0 - NicChRGanglionBlock)
@@ -901,43 +877,53 @@ begin
       Heart.Rate := 1. + (85.0
                      - 100.*Heart.MusChR
                      - 110.*AdenR
-                     + 220.*Heart.BetaAdR*(1.0-Heart.MusChR) )*CaChannels;
+                     + 200.0*Heart.BetaAdR*(1.0 - Heart.MusChR) )*CaChannels;
       Heart.Rate := Max(Heart.Rate, 0.01);
       PulseInterval := 60. / Max(Heart.Rate,1.0) ;
 
-     // Update vasculature perpherhal resistance
-     PeripheralFlow := 1.0
-                       - 1.0*AlphaAdR
+     // Update vasculature peripherhal resistance
+     PeripheralFlow := 1.3
+                       - 2.0*AlphaAdR
                        - 0.325*(1.0 - CaChannels)
-                       + {1.75}2.2*BetaAdR
+                       + {1.75}{2.2*}3.5*BetaAdR
                        + 0.75*MusChR
                        + 0.7*AdenR
                        + 2.5*H1R  ;
 
-     // Update Blood Pressure
-     dbp := (Heart.SystolicForce*0.5*(2.0-bp.value) - (PeripheralFlow)*bp.value)*t.step ;
-     bp.value := Max((bp.value + dbp),0.0) ;
+//     Update heart force
 
-     if( t.time >= t.systole ) then
-         begin
-  //     Update heart force
-         Heart.SystolicForce := 0.3 +(
+         Heart.SystolicForce := 0.333 +(
                                 2.0
-                                + 3.5*Heart.BetaAdR
+                                + 1.5*Heart.BetaAdR
                                 - 1.0*Heart.MusChR
                                 - 3.25*AdenR
                                  )*CaChannels ;
          Heart.SystolicForce := Max( 0.01,Heart.SystolicForce ) ;
-         t.diastole := t.time + Min(0.11,PulseInterval/4.0 );
-         t.systole := t.systole + PulseInterval ;
-         end ;
 
-     if ( t.time >= t.diastole ) then
-         begin
-//         bp.systolic := bp.value ;
-         t.diastole := 1E30 ;
-         Heart.SystolicForce := 0.;
-         end ;
+     if t.time >= (t.pulse + (60.0 / Heart.Rate )) then
+        begin
+        t.pulse := t.pulse + 60.0/Heart.Rate ;
+        bp.mean := bp.diastolic + 0.3*(bp.systolic - bp.diastolic) ;
+        bp.diastolic := 1E30 ;
+        bp.systolic := 0 ;
+
+        end;
+
+
+     // Create heart contractile pulse
+     // Gaussian distribution over 80% of APD duraion
+     APDuration := Min( (60.0 / Heart.Rate)*0.7, 1.0) ;
+     APForceSD := APDuration/7.1 ;
+     z := (t.time - t.Pulse - (APDuration/2.0) ) / APForceSD ;
+     y := Heart.SystolicForce*(0.17/ (APForceSD*sqrt(2.0*Pi())))*exp( -0.5*z*z) ;
+
+     // Update Blood Pressure
+
+     dbp := (y*0.5*(2.0-bp.value) - (PeripheralFlow)*bp.value)*t.step ;
+     bp.value := Max((bp.value + dbp),0.0) ;
+
+     bp.diastolic := Min(bp.value,bp.diastolic) ;
+     bp.systolic := Max(bp.value,bp.systolic) ;
 
      { * Nerve-evoked skeletal muscle contractions *
        Blocked by Tubocurarine & Gallamine
@@ -1000,22 +986,10 @@ begin
 
      { The cat dies if the B.P. falls too low for too long }
      if not Dead then begin
-        if bp.mean*BPMAX < 20. then Inc(Dying)
+        if (bp.value*BPMAX < 10.0) or (bp.value*BPMAX >= BPFatal) then Inc(Dying)
                                else Dying := 0 ;
         if Dying = 600 then begin
- {          bp.mean := 0. ;
-           bp.value := 0. ;
-           bp.systolic := 0. ;
-           Heart.Rate := 0. ;
-           SkelMuscle.Contraction := 0. ;
-           NictMem.Contraction := 0. ;
-           j := pbDisplay.font.size ;
-           pbDisplay.canvas.font.size := 16 ;
-           pbDisplay.canvas.TextOut( pbDisplay.Width div 4,
-                                     pbDisplay.Height div 2,
-                                     'Your cat has just died!!!' ) ;
-           pbDisplay.canvas.font.size := j ;
-           Dead := True ;}
+           Dead := True ;
            end ;
         end
      else begin
@@ -1029,7 +1003,9 @@ begin
         end ;
 
      // Return results for this time point ;
-     ArterialBP := BP.Value ;
+
+     ArterialBP := BP.Value*BPMAX ;
+     ArterialBPMean := BP.mean*BPMAX ;
      HeartRate := Heart.Rate ;
      SkeletalMuscleContraction := SkelMuscle.Contraction ;
      NicMemContraction := NicMem.Contraction ;
@@ -1163,7 +1139,7 @@ procedure TModel.StimulateNerves( StimulationOn : Boolean ;  // TRUE = Stimulati
 // Stimulate selected nerves
 // -------------------------
 const
-    StimVagusPeriod = 5.0 ;
+    StimVagusPeriod = 7.5 ;
     StimSkeletalMusclePeriod = 1.0 ;
     StimNicMembranePeriod = 5.0 ;
 var

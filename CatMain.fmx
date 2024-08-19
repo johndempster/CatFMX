@@ -2,9 +2,9 @@ object MainFrm: TMainFrm
   Left = 0
   Top = 0
   Caption = 
-    'Anaesthetised Cat V3.0.1 (c) J. Dempster, University of Strathcl' +
-    'yde 1996-2024. (2.8.24)'
-  ClientHeight = 720
+    'Anaesthetised Cat V3.0.2 (c) J. Dempster, University of Strathcl' +
+    'yde 1996-2024. 19.8.24)'
+  ClientHeight = 897
   ClientWidth = 1180
   StyleBook = StyleBook1
   FormFactor.Width = 320
@@ -21,7 +21,7 @@ object MainFrm: TMainFrm
     Position.X = 305.000000000000000000
     Position.Y = 54.000000000000000000
     Size.Width = 833.000000000000000000
-    Size.Height = 658.000000000000000000
+    Size.Height = 835.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     object Page: TTabControl
@@ -29,16 +29,16 @@ object MainFrm: TMainFrm
       Position.X = 8.000000000000000000
       Position.Y = 13.000000000000000000
       Size.Width = 807.000000000000000000
-      Size.Height = 637.000000000000000000
+      Size.Height = 814.000000000000000000
       Size.PlatformDefault = False
       TabIndex = 0
       TabOrder = 1
       TabPosition = PlatformDefault
       Sizes = (
         807s
-        610s
+        787s
         807s
-        610s)
+        787s)
       object ChartTab: TTabItem
         CustomIcon = <
           item
@@ -58,7 +58,7 @@ object MainFrm: TMainFrm
           Position.X = 16.000000000000000000
           Position.Y = 8.000000000000000000
           Size.Width = 777.000000000000000000
-          Size.Height = 632.000000000000000000
+          Size.Height = 541.000000000000000000
           Size.PlatformDefault = False
           OnMouseUp = scDisplayMouseUp
           CursorChangeInProgress = False
@@ -69,6 +69,8 @@ object MainFrm: TMainFrm
           XMax = 1023
           XOffset = 0
           CursorsEnabled = True
+          YAxisNoNegativeRange = True
+          CursorNumberFormat = '%5.4g'
           TScale = 1.000000000000000000
           TUnits = 's'
           TCalBar = 1.000000000000000000
@@ -102,7 +104,7 @@ object MainFrm: TMainFrm
           Anchors = [akLeft, akRight]
           Padding.Right = 300.000000000000000000
           Position.X = 16.000000000000000000
-          Position.Y = 557.000000000000000000
+          Position.Y = 725.004943847656300000
           Size.Width = 785.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
@@ -7477,7 +7479,7 @@ object MainFrm: TMainFrm
     Position.X = 8.000000000000000000
     Position.Y = 54.000000000000000000
     Size.Width = 289.000000000000000000
-    Size.Height = 658.000000000000000000
+    Size.Height = 835.000000000000000000
     Size.PlatformDefault = False
     Text = 'Controls'
     TabOrder = 1
@@ -7549,14 +7551,16 @@ object MainFrm: TMainFrm
         ShowHint = True
       end
       object ckNicMembrane: TCheckBox
-        Hint = 'Stimulate nerve to nictitating membrane over cat'#39's eye'
+        Hint = 
+          'Stimulate pre-ganglionic superior cervical nerve feeding nictita' +
+          'ting membrane'
         Position.X = 8.000000000000000000
         Position.Y = 67.000000000000000000
         Size.Width = 201.000000000000000000
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 4
-        Text = 'Nictitating Membrane'
+        Text = 'Superior Cervical Nerve'
         ParentShowHint = False
         ShowHint = True
       end
@@ -7568,7 +7572,7 @@ object MainFrm: TMainFrm
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 3
-        Text = 'Skeletal Muscle'
+        Text = 'Skeletal Muscle Nevre'
         ParentShowHint = False
         ShowHint = True
       end

@@ -53,6 +53,11 @@ unit CatMain;
                       Incorrect alpha-2 adrenoceptor agonist activity of phentolamine removed
   4.0.0  12.07.24     Rebuilt using FMX multiplatfom framework
   V3.0.1 2.8.24       Invalid entries in agonist drugs list which caused crashes removed.
+  V3.0.2 19.08.24     Channel traces now coloured as in V2.6.2
+                      Adrenergic responses revised to make distinction between NOR,ADR,ISO clearer
+                      Baroreceptor feedback smoother, fewer oscillations
+                      Heart force now implemented as gaussian pulse waveform
+                      Issues raised by Bruno Frenguelli dealt with.
   ======================================================================== }
 
 interface
@@ -66,8 +71,20 @@ uses
   FMX.Menus, FMX.Platform, CatModel, FMX.Layouts, System.Actions, FMX.ActnList ;
 
 const
+
+     NumChannels = 4 ; // No. of chart channels
+
+     ChABP = 0 ;   // Arterial blood pressure channel }
+     ChHR = 1 ;    // Heart rate channel }
+     ChNIC = 2 ;   // Nictitating membrane }
+     ChSKM = 3 ;   // Skeletal muscle
+
     MaxPoints = 1000000 ;
     MaxDisplayPoints = 6000 ;
+    MaxADCValue = 10000 ;
+    MinADCValue = -10000 ;
+    BPDISPLAYMAX = 400.0 ;
+
     MaxMarkers = 500 ;
     NumBytesPerMarker = 40 ;
     FileHeaderSize = (MaxMarkers+10)*NumBytesPerMarker ;
@@ -184,6 +201,7 @@ type
     NumPointsInBuf : Integer ;   // No. of data points in buffer
     StartPoint : Integer ;
     NumPointsDisplayed : Integer ;
+    BPAvgLine : Integer ;
     ChangeDisplayWindow : Boolean ;
     ClearExperiment : Boolean ;
     RangeChange : Boolean ;
@@ -296,8 +314,8 @@ System.Math, FMX.DialogService , ModalBox;
 {$R *.fmx}
 
 const
-    MaxADCValue = 2047 ;
-    MinADCValue = -2048 ;
+//    MaxADCValue = 2047 ;
+//    MinADCValue = -2048 ;
     NoiseStDev = 10 ;
     MaxDisplayForce = 20.0 ;
 
@@ -395,21 +413,24 @@ begin
     { Blood pressure }
      scDisplay.ChanName[ChABP] := 'ABP' ;
      scDisplay.ChanUnits[ChABP] := 'mmHg' ;
-     scDisplay.ChanScale[ChABP] := BPMax / MaxADCValue ;
+     scDisplay.ChanScale[ChABP] := BPDISPLAYMAX / MaxADCValue ;
      scDisplay.ChanZero[ChABP] := 0.0 ;
-     scDisplay.ChanOffsets[ChABP] := chABP ;
+     scDisplay.ChanOffsets[ChABP] := 0 ;
      scDisplay.yMax[ChABP] := 120.0/scDisplay.ChanScale[ChABP] ;
      scDisplay.yMin[ChABP]:= -10.0/scDisplay.ChanScale[ChABP] ;
+     scDisplay.ChanColor[ChABP] := TAlphaColors.Blue ;
      scDisplay.ChanVisible[ChABP] := True ;
+     scDisplay.ChanNumSignals[ChABP] := 2 ;
 
      { Heart rate }
      scDisplay.ChanName[chHR] := 'HR' ;
      scDisplay.ChanUnits[chHR] := 'BPM' ;
      scDisplay.ChanZero[chHR] := 0.0 ;
      scDisplay.ChanScale[ChHR] := 400.0 / MaxADCValue ;
-     scDisplay.ChanOffsets[chHR] := chHR ;
+     scDisplay.ChanOffsets[chHR] := 2 ;
      scDisplay.yMax[chHR]  := 150.0/scDisplay.ChanScale[ChHR] ;
      scDisplay.yMin[chHR]:= -10.0/scDisplay.ChanScale[ChHR] ;
+     scDisplay.ChanColor[ChHR] := TAlphaColors.Red ;
      scDisplay.ChanVisible[chHR] := True ;
 
      { Nictitating membrane }
@@ -417,9 +438,10 @@ begin
      scDisplay.ChanUnits[chNIC] := 'gms' ;
      scDisplay.ChanScale[chNIC] := 200.0 / MaxADCValue ;
      scDisplay.ChanZero[chNIC] := 0.0 ;
-     scDisplay.ChanOffsets[chNIC] := chNIC ;
+     scDisplay.ChanOffsets[chNIC] := 3 ;
      scDisplay.yMax[chNIC] := 100.0/scDisplay.ChanScale[chNIC] ;
      scDisplay.yMin[chNIC]:= -scDisplay.yMax[chNIC]*0.1 ;
+     scDisplay.ChanColor[ChNIC] := TAlphaColors.Purple ;
      scDisplay.ChanVisible[chNIC] := True ;
 
      { Skeletal muscle }
@@ -427,15 +449,18 @@ begin
      scDisplay.ChanUnits[chSKM] := 'gms' ;
      scDisplay.ChanScale[chSKM] := (SKMax*1.1) / MaxADCValue ;
      scDisplay.ChanZero[chSKM] := 0.0 ;
-     scDisplay.ChanOffsets[chSKM] := chSKM ;
+     scDisplay.ChanOffsets[chSKM] := 4 ;
      scDisplay.yMax[chSKM] := (SKMax*0.8)/scDisplay.ChanScale[chSKM] ;
      scDisplay.yMin[chSKM]:= -scDisplay.yMax[chSKM]*0.1 ;
+     scDisplay.ChanColor[ChSKM] := TAlphaColors.Green ;
      scDisplay.ChanVisible[chSKM] := True ;
 
      scDisplay.xMin := 0 ;
      scDisplay.xMax := scDisplay.MaxPoints-1 ;
      scDisplay.xOffset := 0 ;
      scDisplay.TScale := 1/20.0 ;
+//     scDisplay.yxisNo
+
      edTDisplay.Min := 1.0/scDisplay.TScale ;
      edTDisplay.Max := 1E5 ;
      edTDisplay.ValueScale := scDisplay.TScale ;
@@ -452,7 +477,7 @@ begin
 
      // Vertical readout cursor
      scDisplay.ClearVerticalCursors ;
-     VertCursor := scDisplay.AddVerticalCursor(-1,TAlphaColors.Green, '?y') ;
+     VertCursor := scDisplay.AddVerticalCursor(-1,TAlphaColors.Green, '?t?y') ;
      scDisplay.VerticalCursors[VertCursor] := scDisplay.MaxPoints div 2 ;
 
      // Initialise experiment
@@ -477,7 +502,6 @@ begin
        bStopStimulator.Enabled := False ;
        bStartStimulator.Enabled := not bStopStimulator.Enabled ;
        Timer.Enabled := True ;
- //    Model.InitialMixing := 0 ;
 
      Resize ;
 
@@ -665,7 +689,7 @@ begin
        edStartTime.Max := sbDisplay.Max ;
        sbDisplay.Value := NumPointsInBuf - StartPoints + 1 ;
        scDisplay.XOffset := Round(sbDisplay.Value) ;
-       scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumChannels] ) ;
+       scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumSignals] ) ;
        edStartTime.Value := scDisplay.XOffset ;
        scDisplay.Repaint ;
        // Add annotations to chart
@@ -694,7 +718,7 @@ begin
     scDisplay.VerticalCursors[VertCursor] := scDisplay.MaxPoints div 2 ;
     scDisplay.XOffset := Round(edStartTime.Value) ;
     sbDisplay.Value := Round(edStartTime.Value) ;
-    scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumChannels] ) ;
+    scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumSignals] ) ;
 
     // Add annotations to chart
     AddChartAnnotations ;
@@ -710,10 +734,12 @@ procedure TMainFrm.SetDoseList(
 // Create list of available doses
 // -----------------------------
 var
-    iDrug,i : Integer ;
+    iDrug,i,OldIndex : Integer ;
     Scale,Dose : Single ;
     Units : String ;
 begin
+
+   OldIndex := Max(cbDose.ItemIndex,0) ;
 
    cbDose.Clear ;
 
@@ -741,7 +767,9 @@ begin
        if (5.0*Dose) <= Model.Drugs[iDrug].MaxDose then cbDose.Items.Add( format(' %.1f %s ',[5.0*Dose*Scale,Units]) ) ;
        Dose := Dose*10.0 ;
        end ;
-     cbDose.ItemIndex := 0 ;
+
+     // Set selected dose to last item selected
+     cbDose.ItemIndex := Max( Min( OldIndex,cbDose.Count-1 ),0) ;
 
      // Add dose in ng/kg in objects field
 
@@ -774,7 +802,7 @@ const
    NumStepsPerDisplay = 4 ;
 var
   i,j,ch : Integer ;
-  ABP, HR, SkelMus, NicMem : Single ;
+  ABP, ABPMean, HR, SkelMus, NicMem : Single ;
 begin
 
      // Ensure that horizontal cursor remains at zero
@@ -804,21 +832,24 @@ begin
         for i := 0 to NumStepsPerDisplay-1 do
             begin
 
-            Model.DoSimulationStep( ABP, HR, SkelMus, NicMem ) ;
+            Model.DoSimulationStep( ABP, ABPMean, HR, SkelMus, NicMem ) ;
 
-            j := NumPointsInBuf*scDisplay.NumChannels ;
-            ADC[j+chABP] := Round( (ABP*BPMax) /scDisplay.ChanScale[chABP]);
-            ADC[j+chHR] := Round( (HR)/scDisplay.ChanScale[chHR]);
-            ADC[j+ChNIC] :=  Round( NicMem/scDisplay.ChanScale[chNIC]) ;
-            ADC[j+ChSKM] := Round( SkelMus/scDisplay.ChanScale[chSKM]) ;
-
-            Inc(NumPointsInBuf) ;
+            j := NumPointsInBuf*scDisplay.NumSignals ;
+            ADC[j + scDisplay.ChanOffsets[chABP]] := Round(ABP/scDisplay.ChanScale[chABP]);
+            // Add mean BP signal to chABP channel
+            ADC[j + scDisplay.ChanOffsets[chABP] + 1] := Round(ABPMean/scDisplay.ChanScale[chABP]);
+            ADC[j + scDisplay.ChanOffsets[chHR]] :=  Round( (HR)/scDisplay.ChanScale[chHR]);
+            ADC[j + scDisplay.ChanOffsets[ChNIC]] :=  Round( NicMem/scDisplay.ChanScale[chNIC]) ;
+            ADC[j + scDisplay.ChanOffsets[ChSKM]] :=  Round( SkelMus/scDisplay.ChanScale[chSKM]) ;
 
             // Ensure trace does not exceed display range
-            for ch := 0 to scDisplay.NumChannels-1 do if ADC[j+ch] > scDisplay.Ymax[ch] then
+            for ch := 0 to scDisplay.NumChannels-1 do if ADC[j + scDisplay.ChanOffsets[ch]] > scDisplay.Ymax[ch] then
                 begin
                 scDisplay.Ymax[ch] := scDisplay.Ymax[ch]*1.1 ;
                 end ;
+
+            Inc(NumPointsInBuf) ;
+
             end;
 
         UpdateDisplay ;
@@ -826,7 +857,7 @@ begin
         { The cat dies if the B.P. falls too low for too long }
         if Model.Dead and (not DeathReported) then
         begin
-        AddDrugMarker('Your rat has died!!!');
+        AddDrugMarker('Your cat has died!!!');
         DeathReported := True ;
         end ;
 //        InitialMixing := InitialMixing + 1 ;
@@ -838,7 +869,7 @@ begin
            begin
            scDisplay.XOffset := Round(sbDisplay.Value) ;
            edStartTime.Value := scDisplay.XOffset ;
-           scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumChannels] ) ;
+           scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumSignals] ) ;
            scDisplay.MaxPoints := Round(edTDisplay.Value);
            scDisplay.XMax := scDisplay.MaxPoints -1 ;
            scDisplay.NumPoints := Min( NumPointsInBuf-Round(sbDisplay.Value)-1,
@@ -992,14 +1023,12 @@ begin
      NumPointsDisplayed := 0 ;
      sbDisplay.Value := NumPointsInBuf + 1 ;
      scDisplay.XOffset := Round(sbDisplay.Value) ;
-     scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumChannels] ) ;
+     scDisplay.SetDataBuf( @ADC[Round(sbDisplay.Value)*scDisplay.NumSignals] ) ;
      sbDisplay.Max := sbDisplay.Max + scDisplay.MaxPoints ;
      scDisplay.NumPoints := 0 ;
-  //   scDisplay.Repaint ;
-//  REsize ;
-    RangeChange := True ;
+     RangeChange := True ;
 
-scDisplay.Height := TDisplayPanel.Position.Y - scDisplay.Position.Y - 10 ;
+    scDisplay.Height := TDisplayPanel.Position.Y - scDisplay.Position.Y - 10 ;
     scDisplay.Repaint ;
 
      // Add annotations to chart
@@ -1178,7 +1207,7 @@ begin
 
      // Write chart data
      FileSeek( FileHandle, FileHeaderSize, 0 ) ;
-     FileWrite( FileHandle, ADC, NumPointsInBuf*NumChannels*2 ) ;
+     FileWrite( FileHandle, ADC, NumPointsInBuf*scDisplay.NumSignals*SizeOf(SmallInt) ) ;
 
      // Close file
      FileClose( FileHandle ) ;
@@ -1208,12 +1237,12 @@ var
     ch : Integer ;
 begin
 
-     // Ensure that lower limit of display kept less than -10% of max.
+ {    // Ensure that lower limit of display kept less than -10% of max.
      for ch := 0 to scDisplay.NumChannels-1 do
          if scDisplay.YMin[ch] < (MinADCValue div 10) then
             begin
             scDisplay.YMin[ch] := MinADCValue div 10 ;
-            end;
+            end;}
 
      scDisplay.Repaint ;
 
@@ -1229,11 +1258,12 @@ var
    AnsiHeaderBuf : Array[0..FileHeaderSize] of ANSIChar ;
    AnsiHeader : ANSIString ;
    Header : TStringList ;
-   i : Integer ;
+   i,j,ch : Integer ;
    FileHandle : THandle ;
    NumMarkers : Integer ;
    MarkerPoint : Integer ;
    MarkerText : String ;
+   y : single ;
 begin
 
      // Create file header Name=Value string list
@@ -1271,7 +1301,7 @@ begin
      if NumPointsInBuf > 0 then
         begin
         FileSeek( FileHandle, FileHeaderSize, 0 );
-        FileRead( FileHandle, ADC, NumPointsInBuf*NumChannels*2 ) ;
+        FileRead( FileHandle, ADC, NumPointsInBuf*scDisplay.NumSignals*SizeOf(SmallInt) ) ;
         end ;
 
      // Close data file
@@ -1285,6 +1315,19 @@ begin
      sbDisplay.Max := NumPointsInBuf ;
 
      ChangeDisplayWindow := True ;
+
+     // Ensure trace does not exceed display range
+     j := 0 ;
+     for i := 0 to NumPointsInBuf-1 do
+         begin
+         for ch := 0 to scDisplay.NumChannels-1 do
+                begin
+                y := ADC[j + scDisplay.ChanOffsets[ch]] ;
+                if y >= scDisplay.Ymax[ch] then scDisplay.Ymax[ch] := y*1.1 ;
+                end ;
+         j := j + scDisplay.NumSignals ;
+         end ;
+
      end ;
 
 
@@ -1352,7 +1395,7 @@ begin
 
         OpenDialog.DefaultExt := DataFileExtension ;
    //OpenDialog.InitialDir := OpenDirectory ;
-        OpenDialog.Filter := format( ' Rat CVS Expt. (*%s)|*%s',
+        OpenDialog.Filter := format( ' Cat Expt. (*%s)|*%s',
                                 [DataFileExtension,DataFileExtension]) ;
         OpenDialog.Title := 'Load Experiment ' ;
 
@@ -1404,7 +1447,7 @@ begin
 //     SaveDialog.options := [ofHideReadOnly,ofPathMustExist] ;
      SaveDialog.FileName := '' ;
      SaveDialog.DefaultExt := DataFileExtension ;
-     SaveDialog.Filter := format( '  Rat CVS Expt. (*%s)|*%s',
+     SaveDialog.Filter := format( '  Cat Expt. (*%s)|*%s',
                                   [DataFileExtension,DataFileExtension]) ;
      SaveDialog.Title := 'Save Experiment' ;
 
