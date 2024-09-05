@@ -58,6 +58,10 @@ unit CatMain;
                       Baroreceptor feedback smoother, fewer oscillations
                       Heart force now implemented as gaussian pulse waveform
                       Issues raised by Bruno Frenguelli dealt with.
+  V3.0.3 05.09.24     BP mean trace in black
+                      HEX now produces little change in HR
+                      ADR produce rise in mean BP
+                      Vagus nerve stim shorter
   ======================================================================== }
 
 interface
@@ -1233,8 +1237,6 @@ procedure TMainFrm.scDisplayMouseUp(Sender: TObject; Button: TMouseButton;
 // -------------------------------
 // Mouse released on chart display
 // -------------------------------
-var
-    ch : Integer ;
 begin
 
  {    // Ensure that lower limit of display kept less than -10% of max.

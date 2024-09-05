@@ -10,6 +10,8 @@ unit CatModel;
 //          Chronic oscillation removed from baroreceptor feedback
 //          Cat now dies when BP exceeds 400 mmHg or < 10 mmHg for too long
 //          adrenergic sy
+// 04.09.24 Adrenaline now produces a slight increase in mean BP and no reduction in diastolic
+//          Now require 20 ug/kg circulating Ach & Carbachol to block skeletal muscle contractions
 
 interface
 
@@ -59,6 +61,7 @@ type
             NicChRGanglionBlock : TDrugProperties ;
             NicChRNicMemGanglion : TDrugProperties ;
             NicChRNMJ : TDrugProperties ;
+            NicChRDesensitization : TDrugProperties ;
             ChEsterase : TDrugProperties ;
             HMCaChannel : TDrugProperties ;
             SMCaChannel : TDrugProperties ;
@@ -323,7 +326,7 @@ begin
      Drugs[iDrug].RemovalRate := FastOff ;
      SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.002 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.0015 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.002 ) ;
      SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.0017 ) ;
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 1E-4 ;
@@ -334,10 +337,10 @@ begin
      Drugs[iDrug] := TDrug.Create( 'Noradrenaline', 'Nor' ) ; // Adrenoceptor agonist
      Drugs[iDrug].OnRate := FastOn ;
      Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.002 ) ;
-     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.002 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.02 ) ;
-     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.02 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdR, 0.004 ) ;
+     SetAgonistPotency( Drugs[iDrug].AlphaAdRNicMem, 0.004 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdR, 0.04 ) ;
+     SetAgonistPotency( Drugs[iDrug].BetaAdRHeart, 0.04 ) ;
      Drugs[iDrug].MinDose := 1E-4 ;
      Drugs[iDrug].MaxDose := 1E-2 ;
      Drugs[iDrug].DrugType := dtAgonist ;
@@ -371,7 +374,8 @@ begin
      Drugs[iDrug].RemovalRate :=FastOff ;
      SetAgonistPotency( Drugs[iDrug].MusChR, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].MusChRHeart, 0.001 ) ;
-     SetAgonistPotency( Drugs[iDrug].NicChR, 0.001 ) ;
+     SetAgonistPotency( Drugs[iDrug].NicChR, 0.005 ) ;
+     SetAgonistPotency( Drugs[iDrug].NicChRDesensitization, 0.01 ) ;
 //   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 1E-4 ;
@@ -383,8 +387,9 @@ begin
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create( 'Carbachol', 'CCH' ) ;
      Drugs[iDrug].OnRate := FastOn ;
-     Drugs[iDrug].RemovalRate := FastOff ;
-     SetAgonistPotency( Drugs[iDrug].NicChR, 0.001 ) ;
+     Drugs[iDrug].RemovalRate := FastOff*0.5 ;
+     SetAgonistPotency( Drugs[iDrug].NicChR, 0.005 ) ;
+     SetAgonistPotency( Drugs[iDrug].NicChRDesensitization, 0.01 ) ;
 //   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
      SetAgonistPotency( Drugs[iDrug].MusChR, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].MusChRHeart, 0.001 ) ;
@@ -395,9 +400,10 @@ begin
      { Suxaamethonium  (depolarizing neuromuscular blocker nicotinic receptor agonist) }
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create( 'Suxamethonium', 'Sux' ) ;
-     Drugs[iDrug].OnRate := FastOn ;
-     Drugs[iDrug].RemovalRate := FastOff*0.5 ;
-     SetAgonistPotency( Drugs[iDrug].NicChR, 0.03) ;
+     Drugs[iDrug].OnRate := FastOn*0.5 ;
+     Drugs[iDrug].RemovalRate := FastOff*0.25 ;
+     SetAgonistPotency( Drugs[iDrug].NicChR, 0.01) ;
+     SetAgonistPotency( Drugs[iDrug].NicChRDesensitization, 0.01 ) ;
 //   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.03) ;
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 0.01 ;
@@ -526,7 +532,7 @@ begin
      Drugs[iDrug] := TDrug.Create( 'Neostigmine', 'Neo' ) ;
      Drugs[iDrug].OnRate := SlowOn ;
      Drugs[iDrug].RemovalRate := SlowOff ;
-     SetAgonistPotency( Drugs[iDrug].ChEsterase, 0.1 ) ;
+     SetAgonistPotency( Drugs[iDrug].ChEsterase, 0.05 ) ;
      Drugs[iDrug].DrugType := dtAntagonist ;
      Drugs[iDrug].MinDose := 0.01 ;
      Drugs[iDrug].MaxDose := 1.0 ;
@@ -536,7 +542,7 @@ begin
      Drugs[iDrug] := TDrug.Create( 'Physostigmine', 'Phy' ) ;
      Drugs[iDrug].OnRate := SlowOn ;
      Drugs[iDrug].RemovalRate := SlowOff ;
-     SetAgonistPotency( Drugs[iDrug].ChEsterase, 0.1 ) ;
+     SetAgonistPotency( Drugs[iDrug].ChEsterase, 0.05 ) ;
      Drugs[iDrug].DrugType := dtAntagonist ;
      Drugs[iDrug].MinDose := 1E-2 ;
      Drugs[iDrug].MaxDose := 1.0 ;
@@ -546,8 +552,8 @@ begin
      Drugs[iDrug] := TDrug.Create(  'Atropine', 'Atr' ) ;
      Drugs[iDrug].OnRate := SlowOn ;
      Drugs[iDrug].RemovalRate := SlowOff ;
-     SetAntagonistPotency( Drugs[iDrug].MusChR, 0.1 ) ; {Potency reduced to 0.1 4/7/00}
-     SetAntagonistPotency( Drugs[iDrug].MusChRHeart, 0.1 ) ;
+     SetAntagonistPotency( Drugs[iDrug].MusChR, 0.75 ) ;
+     SetAntagonistPotency( Drugs[iDrug].MusChRHeart, 0.75 ) ;
      Drugs[iDrug].DrugType := dtAntagonist ;
      Drugs[iDrug].MinDose := 0.1 ;
      Drugs[iDrug].MaxDose := 10.0 ;
@@ -593,7 +599,8 @@ begin
      Drugs[iDrug].RemovalRate :=FastOff ;
      SetAgonistPotency( Drugs[iDrug].MusChR, 0.001 ) ;
      SetAgonistPotency( Drugs[iDrug].MusChRHeart, 0.001 ) ;
-     SetAgonistPotency( Drugs[iDrug].NicChR, 0.001 ) ;
+     SetAgonistPotency( Drugs[iDrug].NicChR, 0.005 ) ;
+     SetAgonistPotency( Drugs[iDrug].NicChRDesensitization, 0.01 ) ;
 //   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.3) ;
      Drugs[iDrug].DrugType := dtUnknown ;
      Drugs[iDrug].MinDose := 1E-4 ;
@@ -654,8 +661,8 @@ begin
      Drugs[iDrug] := TDrug.Create(  'Drug K', 'K' ) ;   { Atropine }
      Drugs[iDrug].OnRate := SlowOn ;
      Drugs[iDrug].RemovalRate := SlowOff ;
-     SetAntagonistPotency( Drugs[iDrug].MusChR, 0.1 ) ; {Potency reduced to 0.1 4/7/00}
-     SetAntagonistPotency( Drugs[iDrug].MusChRHeart, 0.1 ) ;
+     SetAntagonistPotency( Drugs[iDrug].MusChR, 1.0 ) ;
+     SetAntagonistPotency( Drugs[iDrug].MusChRHeart, 1.0 ) ;
      Drugs[iDrug].DrugType := dtUnknown ;
      Drugs[iDrug].MinDose := 0.1 ;
      Drugs[iDrug].MaxDose := 10.0 ;
@@ -695,9 +702,9 @@ begin
      // Activates muscarinic cholinoceptors on heart
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create(  'VagusStim', '' ) ;
-     Drugs[iDrug].OnRate := NerveOn*0.017 ;
-     Drugs[iDrug].RemovalRate := NerveOff*0.017 ;
-     SetAgonistPotency( Drugs[iDrug].MusChRHeart, 1.7 ) ;
+     Drugs[iDrug].OnRate := NerveOn*0.1 ;
+     Drugs[iDrug].RemovalRate := NerveOff*0.075 ;
+     SetAgonistPotency( Drugs[iDrug].MusChRHeart, 2.5 ) ;
      iVagusStim := iDrug ;
 
      { Pre-ganglionic nerve innervating nictitating membrane stimulates nicotonic choliniceptors }
@@ -774,6 +781,7 @@ var
    Num,Denom,z,y : single ;
    Smooth : single ;
    PotencyMultiplier,APDuration,APForceSD : single ;
+   AdditionalNicCh : single ;
 begin
 
      { Update drugs in circulation }
@@ -810,9 +818,10 @@ begin
 
      { Vagus nerve stimulation (Blocked by morphine ) }
 
-       BPResting := 100.0/BPMAX ;
+       BPResting := {100.0}90.0/BPMAX ;
  //      bp.mean := BPResting ;
        Baroreceptors := 1.0 / (1.0 + exp( -(BP.mean - BPResting)/0.12)) ;
+ //      Baroreceptors := 0.5 ;
 
       // Nicotinic cholinoceptor channel block on ganglion neuronss
       for i := 0 to High(Drugs) do if Drugs[i] <> Nil then
@@ -824,7 +833,6 @@ begin
        { V2.2 1/10/97 Cholinesterase inhibition now enhances release of
          Ach from vagus, requested by EGR }
 
-       log.d(format('%.4g',[Baroreceptors])) ;
        Drugs[iVagusBaroreceptors].Dose := 0.6*Baroreceptors
                                           * (1.0 + (ChEsterase*10.0) )
                                           * (1.0 - NicChRGanglionBlock)
@@ -874,7 +882,7 @@ begin
           MusChR := ReceptorActivation(i,Drugs[i].Dose,Drugs[i].MusChR,Num,Denom, 2 ) ;
 
 //     Update Heart Rate
-      Heart.Rate := 1. + (85.0
+      Heart.Rate := 1. + ({85.0} 110.0
                      - 100.*Heart.MusChR
                      - 110.*AdenR
                      + 200.0*Heart.BetaAdR*(1.0 - Heart.MusChR) )*CaChannels;
@@ -883,12 +891,13 @@ begin
 
      // Update vasculature peripherhal resistance
      PeripheralFlow := 1.3
-                       - 2.0*AlphaAdR
-                       - 0.325*(1.0 - CaChannels)
-                       + {1.75}{2.2*}3.5*BetaAdR
-                       + 0.75*MusChR
-                       + 0.7*AdenR
-                       + 2.5*H1R  ;
+                       - 2.2*AlphaAdR                   // Alpha adrenoceptor vasodilation
+                       - 0.325*(1.0 - CaChannels)       // Ca channel block  vasodilation
+                       + {1.75}{2.2*}3.5*BetaAdR        // Beta adrenoceptor vasodilation
+                       + 0.75*MusChR                    // Muscarinic receptor mediated vasodilation
+                       + 0.7*AdenR                      // Adenosine mediate vasodilation
+                       + 1.5*H1R                       // Histamine cause vasodilation
+                       + 0.325*NicChRGanglionBlock ;     // Effect of ganglion block on symapthetic alpha-Adr nerves
 
 //     Update heart force
 
@@ -906,9 +915,7 @@ begin
         bp.mean := bp.diastolic + 0.3*(bp.systolic - bp.diastolic) ;
         bp.diastolic := 1E30 ;
         bp.systolic := 0 ;
-
         end;
-
 
      // Create heart contractile pulse
      // Gaussian distribution over 80% of APD duraion
@@ -943,24 +950,30 @@ begin
           begin
           if ANSIContainsText(Drugs[i].Name,'acetylcholine') then PotencyMultiplier := 1.0/(1.0+ChEsterase*4.0)
                                                              else PotencyMultiplier := 1.0 ;
+
+          // Otherwise only nerve released Ach activates receptors at neuromuscular junction
+          SkelMuscle.NicChR := ReceptorActivation(i,Drugs[i].Dose,Drugs[i].NicChRNMJ,Num,Denom, 1 ) ;
           if Drugs[i].CloseArterialInjection then
              begin
              // If close arterial injection of nicotinic agonist, use general NicChR drug potencies
              SkelMuscle.NicChR := ReceptorActivation(i,Drugs[i].Dose,Drugs[i].NicChR,Num,Denom, 1 ) ;
-             end
-          else begin
-             // Otherwise only nerve released Ach activates receptors at neuromuscular junction
-             SkelMuscle.NicChR := ReceptorActivation(i,Drugs[i].Dose,Drugs[i].NicChRNMJ,Num,Denom, 1 ) ;
-             end;
+             end ;
 
+          end;
+
+
+//          log.d( format('SkelMuscle.NicChR=%.3g',[SkelMuscle.NicChR]));
+
+      for i := 0 to High(Drugs) do if Drugs[i] <> Nil then
+          begin
+          NicChRDesensitization := ReceptorActivation(i,Drugs[i].Dose,Drugs[i].NicChRDesensitization,Num,Denom, 1 ) ;
           end ;
 
        // Desensitization of junctional receptors after activation by circulating nicotinic agonists
-       NicChRDesensitization := (1.0-0.01)*NicChRDesensitization + (0.01)*(1.0 / (1.0 + (NicChR*NicChR)*30.0)) ;
+  //     NicChRDesensitization := (1.0-0.01)*NicChRDesensitization + (0.01)*(1.0 / (1.0 + (NicChR*NicChR)*30.0)) ;
 
        // Peak skeletal muscle twitch
-       SkelMuscle.Contraction := SKMax*AddNoise(0.03) * ( 1./ ( 1. + exp(-((SkelMuscle.NicChR- 0.6)/0.1))  ))
-                                 *NicChRDesensitization ;
+       SkelMuscle.Contraction := SKMax*AddNoise(0.03) * ( 1./ ( 1. + exp(-((SkelMuscle.NicChR- 0.6)/0.1))  )) * (1.0 - NicChRDesensitization) ;
 
        // Nictitating membrane
        // ====================
@@ -1052,6 +1065,8 @@ begin
      NicChRNicMemGanglion.Potency := None ;
      NicChRNMJ.Efficacy := None ;
      NicChRNMJ.Potency := None ;
+     NicChRDesensitization.Efficacy := None ;
+     NicChRDesensitization.Potency := None ;
      ChEsterase.Efficacy := None ;
      ChEsterase.Potency := None ;
      HMCaChannel.Efficacy := None ;
