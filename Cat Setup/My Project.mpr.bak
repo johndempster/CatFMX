@@ -1,4 +1,4 @@
-..\..\..\..\..\New Project\New Project.mia
+My Project.mia
 componentstree.dfm
 componentstree.dfm.miaf
 destination.dfm
@@ -297,30 +297,33 @@ $
 
 
 
+
+
+
 $
 $
 0
-Structured
-FALSE
-C:\Users\John\Documents\Embarcadero\Studio\Projects\CatFMX\
-J. Dempster, Strathclyde Institute for Pharmacy & Biomedical Sciences
+4
+TRUE
+
+John Dempster, University of Strathclyde
 Anaesthetised Cat
-{98B151E0-A414-45A0-A517-D2D89685CD83}
-{FEAC88BF-AFEB-41D2-95F6-B283DDCBC593}
-3.0.3
+{F301F84A-82FB-4A4B-B713-89B04245CDE6}
+{5437B8AE-4611-4159-8B98-092C028049A6}
+3.0.4
 English
-Anaesthetised Cat
-Anaesthetised Cat Installation
-J. Dempster, Strathclyde Institute for Pharmacy & Biomedical Sciences
+My Project
+My Project Installation
+My Company
 All rights reserved
-{24866FEA-4D1E-4A25-B57C-596E787EFD41}
-J. Dempster, Strathclyde Institute for Pharmacy & Biomedical Sciences
-J. Dempster, Strathclyde Institute for Pharmacy & Biomedical Sciences
+{2ABD8B5C-E873-4879-B26A-78A4CC12C171}
+My Company
+My Company
 http://www.mywebsite.com/
 http://www.mywebsite.com/
 All rights reserved
 FALSE
-Cat_Win_Setup_V3.0.3
+Cat_Win_Setup_V3.0.4
 TRUE
 FALSE
 
@@ -342,6 +345,8 @@ FALSE
 FALSE
 FALSE
 
+..\..\..\..\..\..\..\..\Program Files (x86)\InstallAware\InstallAware 2012\runtimes\checkmsi20.mia
+..\..\..\..\..\..\..\..\Program Files (x86)\InstallAware\InstallAware 2012\runtimes\setupmsi20.mia
 $
 FALSE
 

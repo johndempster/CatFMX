@@ -208,7 +208,7 @@ type
     NumPointsInBuf : Integer ;   // No. of data points in buffer
     StartPoint : Integer ;
     NumPointsDisplayed : Integer ;
-    BPAvgLine : Integer ;
+//  BPAvgLine : Integer ;
     ChangeDisplayWindow : Boolean ;
     ClearExperiment : Boolean ;
     RangeChange : Boolean ;
@@ -361,10 +361,14 @@ end;
 
 
 procedure TMainFrm.FormResize(Sender: TObject);
+// -----------------------------------
+// Main form resized - adjust controls
+// -----------------------------------
 begin
- //   scDisplay.Width := ChartTab.Width - scDisplay.Position.X - 50 ;
+
     scDisplay.Height := TDisplayPanel.Position.Y - scDisplay.Position.Y - 10 ;
     scDisplay.Repaint ;
+
 end;
 
 

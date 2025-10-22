@@ -36,9 +36,9 @@ object MainFrm: TMainFrm
       TabPosition = PlatformDefault
       Sizes = (
         807s
-        560s
+        559s
         807s
-        560s)
+        559s)
       object ChartTab: TTabItem
         CustomIcon = <
           item
@@ -46,8 +46,8 @@ object MainFrm: TMainFrm
         TextSettings.Trimming = None
         StyledSettings = [Family, Size, Style]
         IsSelected = True
-        Size.Width = 49.000000000000000000
-        Size.Height = 26.000000000000000000
+        Size.Width = 55.000000000000000000
+        Size.Height = 27.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'TabItemstyle'
         TabOrder = 0
@@ -102,10 +102,10 @@ object MainFrm: TMainFrm
           FontSize = 15
         end
         object TDisplayPanel: TPanel
-          Anchors = [akLeft, akRight]
+          Anchors = [akLeft, akRight, akBottom]
           Padding.Right = 300.000000000000000000
-          Position.X = 16.000000000000000000
-          Position.Y = 494.727264404296900000
+          Position.X = 10.000000000000000000
+          Position.Y = 503.000000000000000000
           Size.Width = 785.000000000000000000
           Size.Height = 44.000000000000000000
           Size.PlatformDefault = False
@@ -231,8 +231,8 @@ object MainFrm: TMainFrm
           end>
         TextSettings.Trimming = None
         IsSelected = False
-        Size.Width = 122.000000000000000000
-        Size.Height = 26.000000000000000000
+        Size.Width = 143.000000000000000000
+        Size.Height = 27.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = ''
         TabOrder = 0
@@ -8550,19 +8550,19 @@ object MainFrm: TMainFrm
       TabPosition = PlatformDefault
       Sizes = (
         265s
-        190s
+        189s
         265s
-        190s
+        189s
         265s
-        190s)
+        189s)
       object AgonistTab: TTabItem
         CustomIcon = <
           item
           end>
         TextSettings.Trimming = None
         IsSelected = True
-        Size.Width = 61.000000000000000000
-        Size.Height = 26.000000000000000000
+        Size.Width = 68.000000000000000000
+        Size.Height = 27.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = ''
         TabOrder = 0
@@ -8652,8 +8652,8 @@ object MainFrm: TMainFrm
           end>
         TextSettings.Trimming = None
         IsSelected = False
-        Size.Width = 78.000000000000000000
-        Size.Height = 26.000000000000000000
+        Size.Width = 87.000000000000000000
+        Size.Height = 27.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = ''
         TabOrder = 0
@@ -8712,8 +8712,8 @@ object MainFrm: TMainFrm
           end>
         TextSettings.Trimming = None
         IsSelected = False
-        Size.Width = 70.000000000000000000
-        Size.Height = 26.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 27.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = ''
         TabOrder = 0

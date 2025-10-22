@@ -43,7 +43,7 @@ type
 
     TDrug = class(TObject)
             public
-            Name : string[40] ;
+            Name : string ;
             ShortName : string ;
             Dose : single ;
             DoseInjected : single ;
@@ -167,7 +167,7 @@ type
    iVagusStim : Integer ;               // Vagus nerve nerve stimulus transmitter release
    iVagusBaroreceptors : Integer ;      // Vagus nerve trasmitter release by baroreceptor activity
    iAcceleransBaroreceptors : Integer ; // Accelerans nerve transmitter release by baroreceptor activity
-   iRestingSympathetic : Integer ;       // Accelerans nerve transmitter release by
+// iRestingSympathetic : Integer ;       // Accelerans nerve transmitter release by
    iNMJ : Integer ;                     // NMJ nerve stimulation
    iNicMemPreGanglionic : Integer ;     // Nictitating membrane pre-ganglionic stimulation
    iNicMemPostGanglionic : Integer ;    // Nictitating membrane post-ganglionic stimulation
@@ -176,7 +176,7 @@ type
    SkelMuscle : TMuscle ; // Skeletal muscle state
    NicMem : TMuscle ;    // Nictitating membrane state
    BP : TBP ;
-   BPDelay : TBPDelay ;
+// BPDelay : TBPDelay ;
 
    Dying : LongInt ;
    Fibrillation : single ;
@@ -971,8 +971,8 @@ begin
       // Nicotinic cholinoceptor activation
       for i := 0 to High(Drugs) do if Drugs[i] <> Nil then
           begin
-          if ANSIContainsText(Drugs[i].Name,'acetylcholine') then PotencyMultiplier := 1.0/(1.0+ChEsterase*4.0)
-                                                             else PotencyMultiplier := 1.0 ;
+          if ContainsText(Drugs[i].Name,'acetylcholine') then PotencyMultiplier := 1.0/(1.0+ChEsterase*4.0)
+                                                         else PotencyMultiplier := 1.0 ;
 
           // Otherwise only nerve released Ach activates receptors at neuromuscular junction
           SkelMuscle.NicChR := ReceptorActivation(i,Drugs[i].Dose,Drugs[i].NicChRNMJ,Num,Denom, 1 ) ;
