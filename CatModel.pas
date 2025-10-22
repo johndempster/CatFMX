@@ -12,6 +12,7 @@ unit CatModel;
 //          adrenergic sy
 // 04.09.24 Adrenaline now produces a slight increase in mean BP and no reduction in diastolic
 //          Now require 20 ug/kg circulating Ach & Carbachol to block skeletal muscle contractions
+// 22.10.25 Drug L (suxamethonium) and Drug M (vecuronium) added to unknown drug list
 
 interface
 
@@ -397,14 +398,13 @@ begin
      Drugs[iDrug].MaxDose := 1.0 ;
      Drugs[iDrug].DrugType := dtAgonist ;
 
-     { Suxaamethonium  (depolarizing neuromuscular blocker nicotinic receptor agonist) }
+     { Suxaaethonium  (depolarizing neuromuscular blocker nicotinic receptor agonist) }
      Inc(iDrug) ;
      Drugs[iDrug] := TDrug.Create( 'Suxamethonium', 'Sux' ) ;
      Drugs[iDrug].OnRate := FastOn*0.5 ;
      Drugs[iDrug].RemovalRate := FastOff*0.25 ;
      SetAgonistPotency( Drugs[iDrug].NicChR, 0.01) ;
      SetAgonistPotency( Drugs[iDrug].NicChRDesensitization, 0.01 ) ;
-//   SetAgonistPotency( Drugs[iDrug].NicChRNicMemGanglion, 0.03) ;
      Drugs[iDrug].DrugType := dtAgonist ;
      Drugs[iDrug].MinDose := 0.01 ;
      Drugs[iDrug].MaxDose := 5.0 ;
@@ -666,6 +666,29 @@ begin
      Drugs[iDrug].DrugType := dtUnknown ;
      Drugs[iDrug].MinDose := 0.1 ;
      Drugs[iDrug].MaxDose := 10.0 ;
+
+     Inc(iDrug) ;
+     Drugs[iDrug] := TDrug.Create( 'Drug L', 'L' ) ;    // Suxamethonium
+     Drugs[iDrug].OnRate := FastOn*0.5 ;
+     Drugs[iDrug].RemovalRate := FastOff*0.25 ;
+     SetAgonistPotency( Drugs[iDrug].NicChR, 0.01) ;
+     SetAgonistPotency( Drugs[iDrug].NicChRDesensitization, 0.01 ) ;
+     Drugs[iDrug].DrugType := dtUnknown ;
+     Drugs[iDrug].MinDose := 0.01 ;
+     Drugs[iDrug].MaxDose := 5.0 ;
+
+     Inc(iDrug) ;
+     Drugs[iDrug] := TDrug.Create( 'Drug M', 'M' ) ;    // Vecuronium
+     Drugs[iDrug].OnRate := SlowOn*1.5 ;
+     Drugs[iDrug].RemovalRate := SlowOff*4.0 ;
+     SetAntagonistPotency( Drugs[iDrug].NicChR, 0.04 ) ;
+     SetAntagonistPotency( Drugs[iDrug].NicChRGanglionBlock, 0.45 ) ;
+     SetAntagonistPotency( Drugs[iDrug].NicChRNMJ, 0.04 ) ;
+     Drugs[iDrug].DrugType := dtUnknown ;
+     Drugs[iDrug].MinDose := 1E-2 ;
+     Drugs[iDrug].MaxDose := 10.0 ;
+
+
 
      // Last drug in list
      LastDrug := iDrug ;
